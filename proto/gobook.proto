@@ -1,0 +1,104 @@
+syntax = "proto3";
+package gobook;
+option go_package = "gobook/pb";
+
+// ========== Messages ==========
+
+message Empty {}
+
+message User {
+    string username = 1;
+    string ip_address = 2;
+}
+
+message RegisterRequest {
+    string username = 1;
+    string ip_address = 2;
+}
+
+message RegisterResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+message Post {
+    string id = 1;
+    string author = 2;
+    string content = 3;
+    int64 timestamp = 4;
+    int32 likes = 5;
+    repeated Comment comments = 6;
+}
+
+message Comment {
+    string author = 1;
+    string content = 2;
+    int64 timestamp = 3;
+}
+
+message NewPostRequest {
+    string author = 1;
+    string content = 2;
+}
+
+
+message LikeRequest {
+    string post_id = 1;
+    string username = 2;
+}
+
+message CommentRequest {
+    string post_id = 1;
+    string author = 2;
+    string content = 3;
+}
+
+message NewsFeedResponse {
+    repeated Post posts = 1;
+}
+
+message OnlineUsersResponse {
+    repeated User users = 1;
+}
+
+message UserRequest {
+    string username = 1;
+}
+
+message UserInfoResponse {
+    string username = 1;
+    string ip_address = 2;
+    bool online = 3;
+}
+
+message PrivateMessage {
+    string from_user = 1;
+    string to_user = 2;
+    string content = 3;
+    int64 timestamp = 4;
+}
+
+message PMResponse {
+    bool success = 1;
+    string message = 2;
+}
+
+// ========== Service ==========
+
+service GoBookRPC {
+    // User management
+    rpc Register(RegisterRequest) returns (RegisterResponse);
+    rpc Unregister(UserRequest) returns (RegisterResponse);
+    rpc GetOnlineUsers(Empty) returns (OnlineUsersResponse);
+    rpc GetUserInfo(UserRequest) returns (UserInfoResponse);
+
+    // News Feed
+    rpc CreatePost(NewPostRequest) returns (Post);
+    rpc GetNewsFeed(Empty) returns (NewsFeedResponse);
+    rpc LikePost(LikeRequest) returns (Post);
+    rpc CommentOnPost(CommentRequest) returns (Post);
+
+    // Private Messages
+    rpc SendPM(PrivateMessage) returns (PMResponse);
+    rpc GetMyPMs(UserRequest) returns (stream PrivateMessage);
+}
